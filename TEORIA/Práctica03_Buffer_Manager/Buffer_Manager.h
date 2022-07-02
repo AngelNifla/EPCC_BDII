@@ -131,7 +131,34 @@ void Buffer_Manager::CLOCK()
 
 void Buffer_Manager::MRU()
 {
-    
+    char reciente{};
+    for (int i = 0,k{0}; i < solicitudes.size(); i++,k++)
+    {
+        if (this->buscar_pagina_Bpool(solicitudes[i]))
+        {
+            reciente = solicitudes[i];
+            if (i<num_frames)
+            {
+                k--;
+            }
+        }else if (k<num_frames)
+        {
+            Buffer->frames.push_back(this->buscar_pagina_Disk(solicitudes[i]));
+            reciente = solicitudes[i];
+        }else
+        {
+            for (int j = 0; j < Buffer->frames.size(); j++)
+            {
+                if (reciente == Buffer->frames[j])
+                {
+                    Buffer->frames[j] = solicitudes[i];
+                    reciente = solicitudes[i];
+                    break;
+                }
+            }
+        }
+    }
+    this->mostrar_BufferPool();
 }
 
 void Buffer_Manager::mostrar_BufferPool()
